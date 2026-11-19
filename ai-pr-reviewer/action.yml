@@ -1,0 +1,20 @@
+name: 'AI PR Code Reviewer'
+description: 'Pull Request değişikliklerini özetler ve olası hataları yorum olarak ekler.'
+author: 'unsal'
+
+inputs:
+  github_token:
+    description: 'GitHub Token'
+    required: true
+    default: ${{ github.token }}
+  gemini_api_key:
+    description: 'Google Gemini API Anahtarı'
+    required: true
+  language:
+    description: 'İnceleme dili (tr veya en)'
+    required: false
+    default: 'tr'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
