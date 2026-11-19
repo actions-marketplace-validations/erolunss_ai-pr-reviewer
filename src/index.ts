@@ -60,15 +60,30 @@ Provide a professional code review in markdown format with the following section
 
     const prompt = `${systemPrompt}\n\nİncelenecek Git Diff:\n\`\`\`diff\n${truncatedDiff}\n\`\`\``;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-    });
+    // Yoğunluk durumunda sırayla denenecek modeller (Fallback zinciri)
+    const modelsToTry = ['gemini-3.8-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    let reviewComment: string | undefined;
 
-    const reviewComment = response.text;
+    for (const modelName of modelsToTry) {
+      try {
+        core.info(`Model deneniyor: ${modelName}...`);
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: prompt,
+        });
+
+        if (response.text) {
+          reviewComment = response.text;
+          core.info(`Başarılı! Yanıt ${modelName} modelinden alındı.`);
+          break;
+        }
+      } catch (err: any) {
+        core.warning(`${modelName} yoğunluk nedeniyle yanıt vermedi (${err.message}). Sıradaki yedek model deneniyor...`);
+      }
+    }
 
     if (!reviewComment) {
-      core.setFailed('Modelden geçerli bir yanıt alınamadı.');
+      core.setFailed('Hiçbir modelden geçerli bir yanıt alınamadı.');
       return;
     }
 

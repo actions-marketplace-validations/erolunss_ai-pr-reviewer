@@ -42783,6 +42783,9 @@ function setFailed(message) {
 function error(message, properties = {}) {
   issueCommand("error", toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
+function warning(message, properties = {}) {
+  issueCommand("warning", toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
 function info(message) {
   process.stdout.write(message + os3.EOL);
 }
@@ -73867,13 +73870,26 @@ Provide a professional code review in markdown format with the following section
 \`\`\`diff
 ${truncatedDiff}
 \`\`\``;
-    const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
-      contents: prompt
-    });
-    const reviewComment = response.text;
+    const modelsToTry = ["gemini-3.8-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    let reviewComment;
+    for (const modelName of modelsToTry) {
+      try {
+        info(`Model deneniyor: ${modelName}...`);
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: prompt
+        });
+        if (response.text) {
+          reviewComment = response.text;
+          info(`Ba\u015Far\u0131l\u0131! Yan\u0131t ${modelName} modelinden al\u0131nd\u0131.`);
+          break;
+        }
+      } catch (err) {
+        warning(`${modelName} yo\u011Funluk nedeniyle yan\u0131t vermedi (${err.message}). S\u0131radaki yedek model deneniyor...`);
+      }
+    }
     if (!reviewComment) {
-      setFailed("Modelden ge\xE7erli bir yan\u0131t al\u0131namad\u0131.");
+      setFailed("Hi\xE7bir modelden ge\xE7erli bir yan\u0131t al\u0131namad\u0131.");
       return;
     }
     info("PR alt\u0131na inceleme yorumu ekleniyor...");
