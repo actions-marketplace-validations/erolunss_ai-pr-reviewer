@@ -1,6 +1,10 @@
-name: 'AI PR Code Reviewer'
-description: 'Pull Request değişikliklerini özetler ve olası hataları yorum olarak ekler.'
-author: 'unsal'
+﻿name: 'Erol AI PR Code Reviewer'
+description: 'Pull Request ozetleyici ve yapay zeka kod inceleme asistani.'
+author: 'erolunss'
+
+branding:
+  icon: 'check-circle'
+  color: 'purple'
 
 inputs:
   github_token:
@@ -8,10 +12,10 @@ inputs:
     required: true
     default: ${{ github.token }}
   gemini_api_key:
-    description: 'Google Gemini API Anahtarı'
+    description: 'Google Gemini API Anahtari'
     required: true
   language:
-    description: 'İnceleme dili (tr veya en)'
+    description: 'Inceleme dili (tr veya en)'
     required: false
     default: 'tr'
 
