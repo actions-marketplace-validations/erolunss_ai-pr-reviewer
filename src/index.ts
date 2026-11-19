@@ -60,15 +60,31 @@ Provide a professional code review in markdown format with the following section
 
     const prompt = `${systemPrompt}\n\nİncelenecek Git Diff:\n\`\`\`diff\n${truncatedDiff}\n\`\`\``;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-    });
+    // Yapay zekanın önerdiği kararlı ve hızlı modeller
+    const modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    let reviewComment: string | undefined;
 
-    const reviewComment = response.text;
+    for (const modelName of modelsToTry) {
+      try {
+        core.info(`Model deneniyor: ${modelName}...`);
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: prompt,
+        });
+
+        if (response.text) {
+          reviewComment = response.text;
+          core.info(`Başarılı! Yanıt ${modelName} modelinden alındı.`);
+          break;
+        }
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        core.warning(`${modelName} başarısız oldu (${errorMessage}). Sıradaki model deneniyor...`);
+      }
+    }
 
     if (!reviewComment) {
-      core.setFailed('Modelden geçerli bir yanıt alınamadı.');
+      core.setFailed('Hiçbir modelden geçerli bir yanıt alınamadı.');
       return;
     }
 
@@ -81,8 +97,9 @@ Provide a professional code review in markdown format with the following section
     });
 
     core.info('Kod incelemesi başarıyla tamamlandı ve yoruma yazıldı!');
-  } catch (error: any) {
-    core.setFailed(`Action başarısız oldu: ${error.message}`);
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    core.setFailed(`Action başarısız oldu: ${errorMsg}`);
   }
 }
 

@@ -9,3 +9,5 @@ function kullaniciyiGetir(id) {
     let sorgu = "SELECT * FROM users WHERE id = " + id;
     return sorgu;
 }
+
+// Test yorumu eklendi
