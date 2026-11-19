@@ -73870,7 +73870,7 @@ Provide a professional code review in markdown format with the following section
 \`\`\`diff
 ${truncatedDiff}
 \`\`\``;
-    const modelsToTry = ["gemini-3.8-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"];
     let reviewComment;
     for (const modelName of modelsToTry) {
       try {
@@ -73885,7 +73885,8 @@ ${truncatedDiff}
           break;
         }
       } catch (err) {
-        warning(`${modelName} yo\u011Funluk nedeniyle yan\u0131t vermedi (${err.message}). S\u0131radaki yedek model deneniyor...`);
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        warning(`${modelName} ba\u015Far\u0131s\u0131z oldu (${errorMessage}). S\u0131radaki model deneniyor...`);
       }
     }
     if (!reviewComment) {
@@ -73903,7 +73904,8 @@ ${reviewComment}`
     });
     info("Kod incelemesi ba\u015Far\u0131yla tamamland\u0131 ve yoruma yaz\u0131ld\u0131!");
   } catch (error2) {
-    setFailed(`Action ba\u015Far\u0131s\u0131z oldu: ${error2.message}`);
+    const errorMsg = error2 instanceof Error ? error2.message : String(error2);
+    setFailed(`Action ba\u015Far\u0131s\u0131z oldu: ${errorMsg}`);
   }
 }
 run();

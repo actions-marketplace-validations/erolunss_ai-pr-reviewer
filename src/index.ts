@@ -60,8 +60,8 @@ Provide a professional code review in markdown format with the following section
 
     const prompt = `${systemPrompt}\n\nİncelenecek Git Diff:\n\`\`\`diff\n${truncatedDiff}\n\`\`\``;
 
-    // Yoğunluk durumunda sırayla denenecek modeller (Fallback zinciri)
-    const modelsToTry = ['gemini-3.8-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    // Yapay zekanın önerdiği kararlı ve hızlı modeller
+    const modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-flash'];
     let reviewComment: string | undefined;
 
     for (const modelName of modelsToTry) {
@@ -77,8 +77,9 @@ Provide a professional code review in markdown format with the following section
           core.info(`Başarılı! Yanıt ${modelName} modelinden alındı.`);
           break;
         }
-      } catch (err: any) {
-        core.warning(`${modelName} yoğunluk nedeniyle yanıt vermedi (${err.message}). Sıradaki yedek model deneniyor...`);
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        core.warning(`${modelName} başarısız oldu (${errorMessage}). Sıradaki model deneniyor...`);
       }
     }
 
@@ -96,8 +97,9 @@ Provide a professional code review in markdown format with the following section
     });
 
     core.info('Kod incelemesi başarıyla tamamlandı ve yoruma yazıldı!');
-  } catch (error: any) {
-    core.setFailed(`Action başarısız oldu: ${error.message}`);
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    core.setFailed(`Action başarısız oldu: ${errorMsg}`);
   }
 }
 
