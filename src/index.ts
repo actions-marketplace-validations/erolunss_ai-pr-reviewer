@@ -61,7 +61,7 @@ Provide a professional code review in markdown format with the following section
     const prompt = `${systemPrompt}\n\nİncelenecek Git Diff:\n\`\`\`diff\n${truncatedDiff}\n\`\`\``;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.8-flash',
       contents: prompt,
     });
 

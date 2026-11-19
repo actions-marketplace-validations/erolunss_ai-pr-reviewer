@@ -73868,7 +73868,7 @@ Provide a professional code review in markdown format with the following section
 ${truncatedDiff}
 \`\`\``;
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.8-flash",
       contents: prompt
     });
     const reviewComment = response.text;
